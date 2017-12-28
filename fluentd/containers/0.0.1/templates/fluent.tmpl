@@ -21,10 +21,26 @@
   type docker_metadata
 </filter>
 
+<filter volume.** container.**>
+  @type record_transformer
+  <record>
+    tag ${tag}
+    hostname ${hostname}
+  </record>
+</filter>
+
+<filter container.**>
+  @type             dedot
+  de_dot            true
+  de_dot_separator  _
+  de_dot_nested     true
+</filter>
+
 <match volume.** container.**>
   @type elasticsearch
   logstash_prefix {{ getv "/self/stack/environment_name" }}
+  logstash_dateformat {{getv "/self/service/metadata/elasticsearch_index_format"}}
   logstash_format true
-  host elasticsearch.rancher.internal
+  host elasticsearch
   port 9200
 </match>
